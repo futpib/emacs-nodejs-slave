@@ -18,7 +18,7 @@ $ npm install -g eval-slave
 Install with [cask](https://cask.github.io/):
 
 ```lisp
-(depends-on "nodejs-slave" :git "https://github.com/futpib/nodejs-slave.git")
+(depends-on "nodejs-slave" :git "https://github.com/futpib/emacs-nodejs-slave.git")
 ```
 
 ```
@@ -37,8 +37,8 @@ Will be on melpa someday.
 ;; you can also use `async-await` if you prefer so
 ```
 
-(emacs-promise)[https://github.com/chuntaro/emacs-promise]
-(emacs-async-await)[https://github.com/chuntaro/emacs-async-await]
+[emacs-promise](https://github.com/chuntaro/emacs-promise)
+[emacs-async-await](https://github.com/chuntaro/emacs-async-await)
 
 ### Run with build-in (rudimentary) s-exp to js compiler
 
@@ -62,7 +62,7 @@ Will be on melpa someday.
 ;; "No way! Your emacs is running 2 days, 7 hours, 9 minutes, 1 second!"
 ```
 
-Check out (tests)[https://github.com/futpib/emacs-nodejs-slave/blob/master/test/emacs-nodejs-slave-test.el] if you wonder what exactly is supported by the JS DSL (contributions are wellcome)
+Check out [tests](https://github.com/futpib/emacs-nodejs-slave/blob/master/test/emacs-nodejs-slave-test.el) if you wonder what exactly is supported by the JS DSL (contributions are welcome)
 
 ### Run js string
 
@@ -70,11 +70,11 @@ Check out (tests)[https://github.com/futpib/emacs-nodejs-slave/blob/master/test/
 (promise-done (promise-chain
  (nodejs-slave-run
   "uptime => new Promise(resolve => {
-    let util = require('util');
-        setTimeout(() => {
-            resolve(util.format(\"No way! Your emacs is running %s!\", uptime))
-        }, 500)
-    })"
+      let util = require('util');
+      setTimeout(() => {
+          resolve(util.format(\"No way! Your emacs is running %s!\", uptime))
+      }, 500)
+  })"
   (emacs-uptime))
  (then (lambda (result)
          (print result)))))
