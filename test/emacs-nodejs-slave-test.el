@@ -161,7 +161,7 @@
   (condition-case err
       (let ((result (await
                      (nodejs-slave-run '(lambda () (throw "kek") ())))))
-        (error "This should be unrechable"))
+        (error "This should be unreachable"))
       (error
        (should (equal (error-message-string err) "kek")))))
 
@@ -169,7 +169,7 @@
   (condition-case err
       (let ((result (await
                      (nodejs-slave-run "() => process.exit(0)"))))
-        (error "This should be unrechable"))
+        (error "This should be unreachable"))
     (error
      (should (equal (await (nodejs-slave-run "() => 1")) 1)))))
 
