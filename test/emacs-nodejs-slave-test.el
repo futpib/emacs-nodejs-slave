@@ -165,6 +165,14 @@
       (error
        (should (equal (error-message-string err) "kek")))))
 
+(async-ert-deftest test/js/process-died-and-restarted
+  (condition-case err
+      (let ((result (await
+                     (nodejs-slave-run "() => process.exit(0)"))))
+        (error "This should be unrechable"))
+    (error
+     (should (equal (await (nodejs-slave-run "() => 1")) 1)))))
+
 (ert-deftest-async
  test/js/run-example
  (done)

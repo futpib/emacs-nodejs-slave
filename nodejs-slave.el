@@ -207,6 +207,8 @@
            ((equal name 'array-end)
             (setq in-array nil)))))))))
 
+(define-error 'nodejs-slave-process-died
+  "Slave `node` process died")
 
 (defun nodejs-slave--make-process ()
   "Make a 'slave' nodejs process."
@@ -224,16 +226,33 @@
     (make-process
      :name "nodejs-slave `node` process"
      :command '("node-eval-slave")
+
      :filter (lambda (proc string)
                (funcall output-reader string))
+
+     :sentinel (lambda (proc event)
+                 (when (not (process-live-p proc))
+                   (condition-case err  ; TODO: simpler way to create error?
+                       (signal 'nodejs-slave-process-died event)
+                     (nodejs-slave-process-died
+                      (maphash (lambda (id value)
+                                 (pcase-let ((`(,resolve ,reject) value))
+                                   (funcall reject err)))
+                               nodejs-slave--tasks-hash)))))
+
      :noquery t)))
 
 (defvar nodejs-slave--process nil)
 
 (defun nodejs-slave--init ()
-  (unless nodejs-slave--process
-    (setq nodejs-slave--process (nodejs-slave--make-process))
-    (process-send-string nodejs-slave--process "[")))
+  (cl-flet ((restart ()
+               (setq nodejs-slave--process (nodejs-slave--make-process))
+               (process-send-string nodejs-slave--process "[")))
+    (cond ((not nodejs-slave--process)
+           (restart))
+          ((not (process-live-p nodejs-slave--process))
+           (delete-process nodejs-slave--process)
+           (restart)))))
 
 (defvar nodejs-slave--task-id 0)
 (defconst nodejs-slave--tasks-hash (make-hash-table))
