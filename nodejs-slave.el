@@ -209,12 +209,17 @@
 (defun nodejs-slave--make-json-objects-array-stream-parser (consumer)
   (let ((in-array nil)
         (in-object-depth 0)
-        (object-string ""))
+        (chars-count 0)
+        (chars-stack nil))
     (cl-flet ((object-append (char)
-                             (setq object-string (concat object-string char)))
+                             (incf chars-count)
+                             (push char chars-stack))
               (object-yield ()
-                            (funcall consumer (json-read-from-string object-string))
-                            (setq object-string "")))
+                            (funcall consumer
+                                     (json-read-from-string
+                                      (apply 'concat (reverse chars-stack))))
+                            (setq chars-count 0
+                                  chars-stack nil)))
       (nodejs-slave--make-strings-to-chars
        (nodejs-slave--make-json-stream-parser
         (lambda (name char)
