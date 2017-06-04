@@ -82,6 +82,11 @@
            (nodejs-slave-js '(condition-case err protectedForm (error handler)))
            "try { protectedForm } catch (err) { handler }")))
 
+(ert-deftest test/js/signal ()
+  (should (equal
+           (nodejs-slave-js '(signal TypeError "undefined is not a function"))
+           "throw new TypeError(\"undefined is not a function\");")))
+
 
 (ert-deftest test/js/strings-to-chars ()
   (let* ((consumer-calls '())

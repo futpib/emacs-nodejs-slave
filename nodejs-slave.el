@@ -95,6 +95,12 @@
                 var
                 (nodejs-slave-js handler-body))))
 
+     ((equal head 'signal)              ; signal
+      (let* ((error-constructor (first tail))
+             (error-arguments (cdr-safe tail)))
+        (format "throw %s;"
+                (nodejs-slave-js `(new ,error-constructor ,@error-arguments)))))
+
      ((equal head 'let)                 ; let
       (let ((pairs (car-safe tail)))
         (let ((names (mapcar 'first pairs))
