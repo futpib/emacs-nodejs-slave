@@ -72,6 +72,16 @@
 (ert-deftest test/js/setq ()
   (should (equal (nodejs-slave-js '(setq a b)) "a = b")))
 
+(ert-deftest test/js/unwind-protect ()
+  (should (equal
+           (nodejs-slave-js '(unwind-protect (run) (fin1) (fin2)))
+           "try { (run)() } finally { (function () {(fin1)();return (fin2)();})() }")))
+
+(ert-deftest test/js/condition-case ()
+  (should (equal
+           (nodejs-slave-js '(condition-case err protectedForm (error handler)))
+           "try { protectedForm } catch (err) { handler }")))
+
 
 (ert-deftest test/js/strings-to-chars ()
   (let* ((consumer-calls '())

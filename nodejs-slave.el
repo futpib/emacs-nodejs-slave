@@ -77,6 +77,24 @@
        `((lambda ()
            ,@tail))))
 
+     ((equal head 'unwind-protect)      ; unwind-protect
+      (let ((try (car-safe tail))
+            (fin (cdr-safe tail)))
+        (format "try { %s } finally { %s }"
+                (nodejs-slave-js try)
+                (nodejs-slave-js `(progn ,@fin)))))
+
+     ((equal head 'condition-case)      ; condition-case
+      (let* ((var (first tail))
+             (body (second tail))
+             (handler (first (cdr-safe (cdr-safe tail))))
+             (handler-condition (first handler)) ; ignored
+             (handler-body (second handler)))
+        (format "try { %s } catch (%s) { %s }"
+                (nodejs-slave-js body)
+                var
+                (nodejs-slave-js handler-body))))
+
      ((equal head 'let)                 ; let
       (let ((pairs (car-safe tail)))
         (let ((names (mapcar 'first pairs))
