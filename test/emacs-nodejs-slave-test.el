@@ -87,6 +87,11 @@
            (nodejs-slave-js '(signal TypeError "undefined is not a function"))
            "throw new TypeError(\"undefined is not a function\");")))
 
+(ert-deftest test/js/eq ()
+  (should (equal
+           (nodejs-slave-js '(eq 1 2))
+           "(1 === 2)")))
+
 
 (ert-deftest test/js/strings-to-chars ()
   (let* ((consumer-calls '())

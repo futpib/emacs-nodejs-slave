@@ -101,6 +101,11 @@
         (format "throw %s;"
                 (nodejs-slave-js `(new ,error-constructor ,@error-arguments)))))
 
+     ((equal head 'eq)                  ; eq
+      (let ((a (first tail))
+            (b (second tail)))
+        (format "(%s === %s)" (nodejs-slave-js a) (nodejs-slave-js b))))
+
      ((equal head 'let)                 ; let
       (let ((pairs (car-safe tail)))
         (let ((names (mapcar 'first pairs))
@@ -109,7 +114,7 @@
           (nodejs-slave-js
            `((lambda ,names ,@body) ,@values)))))
 
-     ((equal head 'setq)                 ; setq
+     ((equal head 'setq)                ; setq
       (let ((name (first tail))
             (value (second tail)))
         (format "%s = %s" name (nodejs-slave-js value))))
