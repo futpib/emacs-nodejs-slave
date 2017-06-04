@@ -106,6 +106,11 @@
             (b (second tail)))
         (format "(%s === %s)" (nodejs-slave-js a) (nodejs-slave-js b))))
 
+     ((equal head 'slot-value)          ; slot-value
+      (let ((object (first tail))
+            (name (second (second tail))))
+        (format "(%s).%s" (nodejs-slave-js object) (nodejs-slave-js name))))
+
      ((equal head 'let)                 ; let
       (let ((pairs (car-safe tail)))
         (let ((names (mapcar 'first pairs))

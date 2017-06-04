@@ -92,6 +92,11 @@
            (nodejs-slave-js '(eq 1 2))
            "(1 === 2)")))
 
+(ert-deftest test/js/slot-value ()
+  (should (equal
+           (nodejs-slave-js '(slot-value [] 'length))
+           "([]).length")))
+
 
 (ert-deftest test/js/strings-to-chars ()
   (let* ((consumer-calls '())
