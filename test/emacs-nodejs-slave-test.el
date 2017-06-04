@@ -212,7 +212,7 @@
                                                    "No way! Your emacs is running %s!"
                                                    uptime)))
                                        1)))))
-       (emacs-uptime))
+       "0 seconds")
     (then (lambda (value)
             (should (equal value "No way! Your emacs is running 0 seconds!"))))
     ) (lambda (v) (funcall done)) done))
@@ -229,7 +229,7 @@
                 resolve(util.format(\"No way! Your emacs is running %s!\", uptime))
             }, 1)
         })"
-       (emacs-uptime))
+       "0 seconds")
     (then (lambda (value)
             (should (equal value "No way! Your emacs is running 0 seconds!"))))
     ) (lambda (v) (funcall done)) done))
