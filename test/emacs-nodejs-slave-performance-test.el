@@ -33,7 +33,7 @@
 
 (ert-deftest test/js/benchmark/objarr-parser ()
   (let* ((parser (nodejs-slave--make-json-objects-array-stream-parser (lambda (x) nil)))
-         (string (file-string (f-join root-test-path "fixtures" "input.smaller.json")))
+         (string (file-string (f-join root-test-path "fixtures" "input.json")))
          (benchmark (benchmark-run 1 (funcall parser string)))
          (wall-time (first benchmark))
          (gc-runs (second benchmark))
