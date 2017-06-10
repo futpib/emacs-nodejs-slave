@@ -104,7 +104,7 @@
          (str2char (nodejs-slave--make-strings-to-chars consumer)))
     (funcall str2char "top")
     (funcall str2char "kek")
-    (should (equal (reverse consumer-calls) '("t" "o" "p" "k" "e" "k")))))
+    (should (equal (reverse consumer-calls) '(?t ?o ?p ?k ?e ?k)))))
 
 (defmacro def-json-test (string expected-calls)
   `(ert-deftest ,(intern (concat "test/js/json-stream-parser/" string)) ()
@@ -122,32 +122,32 @@
 
 (def-json-test
   "[]"
-  '((array-start "[")
-    (array-end "]")))
+  '((array-start ?\[)
+    (array-end ?\])))
 
 (def-json-test
   "[\"foo\"]"
-  '((array-start "[")
-    (string-start "\"")
-    (nil "f")
-    (nil "o")
-    (nil "o")
-    (string-end "\"")
-    (array-end "]")))
+  '((array-start ?\[)
+    (string-start ?\")
+    (nil ?f)
+    (nil ?o)
+    (nil ?o)
+    (string-end ?\")
+    (array-end ?\])))
 
 (def-json-test
   "{}"
-  '((object-start "{")
-    (object-end "}")))
+  '((object-start ?\{)
+    (object-end ?\})))
 
 (def-json-test
   "\"[{}]\""
-  '((string-start "\"")
-    (nil "[")
-    (nil "{")
-    (nil "}")
-    (nil "]")
-    (string-end "\"")))
+  '((string-start ?\")
+    (nil ?\[)
+    (nil ?\{)
+    (nil ?\})
+    (nil ?\])
+    (string-end ?\")))
 
 (ert-deftest test/js/objects-array-stream ()
   (let* ((consumer-calls '())

@@ -153,73 +153,67 @@
 
 (defun nodejs-slave--make-strings-to-chars (consumer)
   (lambda (string)
-    (mapcar consumer (split-string string "" t))))
+    (mapcar consumer string)))
 
 (defun nodejs-slave--make-json-stream-parser (consumer)
   (let ((stack '())
         (prev-char nil))
 
     (lambda (char)
-      (let ((char-handled nil))
+      (cond
 
-        (cond
+       ((and (equal (first stack) 'string)
+             (equal char ?\")
+             (not (equal prev-char ?\\)))
 
-         ((and (equal (first stack) 'string)
-               (equal char "\"")
-               (not (equal prev-char "\\")))
+        (funcall consumer 'string-end char)
+        (pop stack))
 
-          (funcall consumer 'string-end char)
-          (pop stack))
+       ((equal (first stack) 'string)
 
-         ((equal (first stack) 'string)
+        (funcall consumer nil char))
 
-          (funcall consumer nil char))
+       ((equal char ?\")
 
-         ((equal char "\"")
+        (funcall consumer 'string-start char)
+        (push 'string stack))
 
-          (funcall consumer 'string-start char)
-          (push 'string stack))
+       ((equal char ?\[)
 
-         ((equal char "[")
+        (funcall consumer 'array-start char)
+        (push 'array stack))
 
-          (funcall consumer 'array-start char)
-          (push 'array stack))
+       ((equal char ?\])
 
-         ((equal char "]")
+        (funcall consumer 'array-end char)
+        (pop stack))
 
-          (funcall consumer 'array-end char)
-          (pop stack))
+       ((equal char ?\{)
 
-         ((equal char "{")
+        (funcall consumer 'object-start char)
+        (push 'object stack))
 
-          (funcall consumer 'object-start char)
-          (push 'object stack))
+       ((equal char ?\})
 
-         ((equal char "}")
+        (funcall consumer 'object-end char)
+        (pop stack))
 
-          (funcall consumer 'object-end char)
-          (pop stack))
+       (t
 
-         (t
+        (funcall consumer nil char)))
 
-          (funcall consumer nil char)))
-
-        (setq prev-char char)))))
+      (setq prev-char char))))
 
 (defun nodejs-slave--make-json-objects-array-stream-parser (consumer)
   (let ((in-array nil)
         (in-object-depth 0)
-        (chars-count 0)
         (chars-stack nil))
-    (cl-flet ((object-append (char)
-                             (incf chars-count)
-                             (push char chars-stack))
+    (cl-flet ((object-append (char) (push char chars-stack))
               (object-yield ()
                             (funcall consumer
                                      (json-read-from-string
-                                      (apply 'concat (reverse chars-stack))))
-                            (setq chars-count 0
-                                  chars-stack nil)))
+                                      (apply 'string (reverse chars-stack))))
+                            (setq chars-stack nil)))
       (nodejs-slave--make-strings-to-chars
        (nodejs-slave--make-json-stream-parser
         (lambda (name char)
